@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/miMain"
+        android:title="Current weather"
+        android:icon="@drawable/ic_main" />
+    <item
+        android:id="@+id/miWeek"
+        android:title="Upcoming weather"
+        android:icon="@drawable/ic_week" />
+    <item
+        android:id="@+id/miSettings"
+        android:title="Settings"
+        android:icon="@drawable/ic_settings" />
+
+</menu>
