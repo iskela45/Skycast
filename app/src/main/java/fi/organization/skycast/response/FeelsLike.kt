@@ -3,9 +3,13 @@ package fi.organization.skycast.response
 
 import com.google.gson.annotations.SerializedName
 
-data class FeelsLike(
-    val day: Double,
-    val night: Double,
-    val eve: Double,
-    val morn: Double
+class FeelsLike(
+    @SerializedName("day")
+    var day: Double = 0.0,
+    @SerializedName("night")
+    var night: Double = 0.0,
+    @SerializedName("eve")
+    var eve: Double = 0.0,
+    @SerializedName("morn")
+    var morn: Double = 0.0
 )

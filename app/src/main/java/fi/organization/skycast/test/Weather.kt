@@ -1,9 +1,9 @@
-package fi.organization.skycast.response
+package fi.organization.skycast.test
 
 
 import com.google.gson.annotations.SerializedName
 
-class WeatherX(
+class Weather(
     @SerializedName("id")
     var id: Int = 0,
     @SerializedName("main")

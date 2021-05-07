@@ -1,15 +1,11 @@
-package fi.organization.skycast.response
+package fi.organization.skycast.test
 
 
 import com.google.gson.annotations.SerializedName
 
-class Temp(
+class FeelsLike(
     @SerializedName("day")
     var day: Double = 0.0,
-    @SerializedName("min")
-    var min: Double = 0.0,
-    @SerializedName("max")
-    var max: Double = 0.0,
     @SerializedName("night")
     var night: Double = 0.0,
     @SerializedName("eve")

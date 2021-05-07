@@ -13,14 +13,140 @@
         android:layout_height="match_parent"
         android:text="Main frag" />
 
-    <Button
-        android:id="@+id/button"
+    <TextView
+        android:id="@+id/temp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/mainFragText"
+        android:text="30°C"
+        android:textSize="85sp"
+        app:layout_constraintBottom_toBottomOf="@+id/mainFragText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/skyDesc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Clear sky"
+        android:textSize="25sp"
+        app:layout_constraintBottom_toTopOf="@+id/temp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/feelsLike"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Feels like: 25*C"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/temp" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/linearLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/feelsLike">
+
+        <ImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:src="@drawable/ic_week" />
+
+        <TextView
+            android:id="@+id/windTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Wind" />
+
+        <TextView
+            android:id="@+id/windVal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="300m/s" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@+id/mainFragText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/feelsLike">
+
+        <ImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:src="@drawable/ic_week" />
+
+        <TextView
+            android:id="@+id/precTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Precipitation" />
+
+        <TextView
+            android:id="@+id/precVal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="300.0 mm" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/linearLayout"
+        app:layout_constraintTop_toBottomOf="@+id/feelsLike">
+
+        <ImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:src="@drawable/ic_week" />
+
+        <TextView
+            android:id="@+id/visTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Wind" />
+
+        <TextView
+            android:id="@+id/visVal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="300 km" />
+
+    </LinearLayout>
+
+    <!-- <LinearLayout
+        android:id="@+id/linearLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="@+id/mainFragText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/feelsLike">
+
+
+    </LinearLayout> -->
+
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

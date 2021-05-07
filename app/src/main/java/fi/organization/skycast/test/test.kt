@@ -1,10 +1,9 @@
-package fi.organization.skycast.response
+package fi.organization.skycast.test
 
 
-import androidx.lifecycle.ViewModel
 import com.google.gson.annotations.SerializedName
 
-class weatherResponse(
+class test(
     @SerializedName("lat")
     var lat: Double = 0.0,
     @SerializedName("lon")
@@ -19,4 +18,4 @@ class weatherResponse(
     var daily: List<Daily> = listOf(),
     @SerializedName("alerts")
     var alerts: List<Alert> = listOf()
-) : ViewModel()
+)
