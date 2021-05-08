@@ -1,6 +1,13 @@
 package fi.organization.skycast
 
-// Convert Unix time to a DateTime format, then split at T to only send the date back.
+/** This file includes functions that'll be needed in multiple classes. */
+
+/**
+ * Convert Unix time to a DateTime format, then split at T to only send the date back.
+ *
+ * @param dt Unix timestamp
+ * @param offset Unix timestamp timezone offset
+ */
 fun timeFormat(dt: Int, offset: Int): String {
     var t = java.time.format.DateTimeFormatter.ISO_INSTANT
         .format(java.time.Instant.ofEpochSecond(dt.toLong() + offset.toLong()))
@@ -8,9 +15,14 @@ fun timeFormat(dt: Int, offset: Int): String {
     return t.split("T")[0]
 }
 
-// Return a drawable based on the image code given.
-fun getImage(image: String) : Int =
-    when (image) {
+/**
+ * Return a drawable based on the icon code given.
+ * If no matches are found return the clear sky icon as a placeholder.
+ *
+ * @param iconCode code given by the openWeather API
+ */
+fun getImage(iconCode: String) : Int =
+    when (iconCode) {
         "01d" -> R.drawable.ow01d
         "01n" -> R.drawable.ow01n
         "02d" -> R.drawable.ow02d

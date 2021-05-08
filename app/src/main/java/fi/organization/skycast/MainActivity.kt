@@ -31,6 +31,11 @@ import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
 
+    // TODO: Set "sensible" default values for all fragment views.
+    // TODO: Mainfrag refresh time
+    // TODO: Subtitle
+    // TODO: Settings
+    // TODO: city api?
     val mainFrag = MainFrag()
     val weekFrag = WeekFragment()
     val settingsFrag = SettingsFrag()
@@ -48,7 +53,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        //title = "Hello StackOverflow"
+        supportActionBar?.subtitle = "Your location"
         val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottomNavigationView)
 
         // Create view model to share data to fragments
