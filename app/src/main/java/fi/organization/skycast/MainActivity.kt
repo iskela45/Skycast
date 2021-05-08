@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
     val mainFrag = MainFrag()
     val weekFrag = WeekFragment()
     val settingsFrag = SettingsFrag()
+    var measurementSystem = "metric"
     var dist = " km"
     var degr = "°C"
     var speed = " m/s"
@@ -54,8 +55,10 @@ class MainActivity : AppCompatActivity() {
         weatherViewModel = ViewModelProvider(this).get(WeatherViewModel::class.java)
         settingsViewModel = ViewModelProvider(this).get(SettingsViewModel::class.java)
 
-
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        // ask for location permissions
         checkForPermissions(android.Manifest.permission.ACCESS_COARSE_LOCATION, "location", COARSE_LOCATION_RQ)
+
 
         // Start with main fragment
         setCurrentFrag(mainFrag)
@@ -70,8 +73,6 @@ class MainActivity : AppCompatActivity() {
             // lambda excepts to return true
             true
         }
-
-        fetchJson("metric", arrayOf<Double>(0.0, 0.0))
         //fetchCityCords()
 
     }
@@ -79,13 +80,29 @@ class MainActivity : AppCompatActivity() {
     fun getCords() {
         // Create location service client
 
+
     }
 
     private fun checkForPermissions(permission: String, name: String, requestCode: Int) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             when {
                 ContextCompat.checkSelfPermission(applicationContext, permission) == PackageManager.PERMISSION_GRANTED -> {
-                    Toast.makeText(applicationContext, "Permission granted", Toast.LENGTH_SHORT).show()
+                    // Toast
+                    Toast.makeText(applicationContext, "Checking location data", Toast.LENGTH_SHORT).show()
+                    // ask location
+                    fusedLocationClient.lastLocation
+                        .addOnSuccessListener { location : Location? ->
+                            // Put latitude and longitude into an array
+                            // 0.0 if location data is null
+                            var locArray = arrayOf<Double>(
+                                location?.latitude ?: 0.0,
+                                location?.longitude ?: 0.0
+                            )
+
+                            fetchJson(measurementSystem, locArray)
+
+                        }
+
                 }
                 shouldShowRequestPermissionRationale(permission) -> showDialog(permission, name, requestCode)
 
@@ -137,9 +154,10 @@ class MainActivity : AppCompatActivity() {
     private fun setCurrentFrag(fragment: Fragment) {
 
         //Bundle
-        val arguments = Bundle()
-        arguments.putInt("VALUE1", 111)
-        fragment.arguments = arguments
+        //val arguments = Bundle()
+        //arguments.putInt("VALUE1", 111)
+        //fragment.arguments = arguments
+
         // Replace replaces the current fragment with the given one
         // commit applies the change.
         supportFragmentManager.beginTransaction().apply {
@@ -154,7 +172,9 @@ class MainActivity : AppCompatActivity() {
         dist = " km"
         degr = "°C"
         speed = " m/s"
-        fetchJson("metric", arrayOf<Double>(0.0, 0.0))
+        measurementSystem = "metric"
+        checkForPermissions(android.Manifest.permission.ACCESS_COARSE_LOCATION, "location", COARSE_LOCATION_RQ)
+
     }
 
     fun checkImperial(v: View) {
@@ -162,12 +182,18 @@ class MainActivity : AppCompatActivity() {
         dist = " miles"
         degr = "°F"
         speed = " mph"
-        fetchJson("imperial", arrayOf<Double>(0.0, 0.0))
+        measurementSystem = "imperial"
+        checkForPermissions(android.Manifest.permission.ACCESS_COARSE_LOCATION, "location", COARSE_LOCATION_RQ)
+
     }
 
-    // temp as string based on units??
-    fun fetchJson(unitType: String, cords: Array<Double>) {
-        val url = "https://api.openweathermap.org/data/2.5/onecall?lat=45&lon=-94.04&units=$unitType&exclude=hourly,minutely&appid=7900bd079ee8808aa0a42b4e13cf1c71"
+    fun fetchJson( unitType: String, cords: Array<Double>) {
+        var lat = cords[0]
+        var lon = cords[1]
+        val url = "https://api.openweathermap.org/data/2.5/onecall?lat=$lat&lon=$lon&units=$unitType&exclude=hourly,minutely&appid=7900bd079ee8808aa0a42b4e13cf1c71"
+
+        println("lat: $lat")
+        println("lon: $lon")
 
         val request = Request.Builder().url(url).build()
         val client = OkHttpClient()
@@ -181,8 +207,6 @@ class MainActivity : AppCompatActivity() {
 
                 // create a variable from weatherResponse and the response body using gson
                 val weatherObj = gson.fromJson(body, weatherResponse::class.java)
-                println(weatherObj)
-                println(weatherObj.current.temp)
 
                 updateData(weatherObj)
             }
@@ -211,9 +235,9 @@ class MainActivity : AppCompatActivity() {
 
                 // create a variable from cityCords and the response body using gson
                 val cityObj = gson.fromJson(body, cityCords::class.java)
-                println("City name: " + cityObj.name)
-                println("latitude: " + cityObj.coord.lat)
-                println("longitude: " + cityObj.coord.lon)
+                //println("City name: " + cityObj.name)
+                //println("latitude: " + cityObj.coord.lat)
+                //println("longitude: " + cityObj.coord.lon)
                 var loc = arrayOf<Double>(cityObj.coord.lat, cityObj.coord.lon)
                 fetchJson("metric", loc)
             }
