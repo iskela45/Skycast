@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity() {
     val COARSE_LOCATION_RQ = 101
 
     lateinit var weatherViewModel: WeatherViewModel
+    lateinit var weekViewModel: WeekViewModel
     lateinit var settingsViewModel: SettingsViewModel
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
@@ -53,6 +54,7 @@ class MainActivity : AppCompatActivity() {
 
         // Create view model to share data to fragments
         weatherViewModel = ViewModelProvider(this).get(WeatherViewModel::class.java)
+        weekViewModel = ViewModelProvider(this).get(WeekViewModel::class.java)
         settingsViewModel = ViewModelProvider(this).get(SettingsViewModel::class.java)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -147,6 +149,8 @@ class MainActivity : AppCompatActivity() {
             weatherViewModel.currentWind.value = data.current.windSpeed.toString() + speed
             weatherViewModel.currentHumi.value = data.current.humidity.toString() + "%"
             weatherViewModel.currentVis.value = (data.current.visibility / 1000).toString() + dist
+            // Put a list of 8 days into viewModel
+            weekViewModel.dailyWeather.value = data.daily
         }
     }
 
