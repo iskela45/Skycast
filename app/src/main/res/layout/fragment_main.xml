@@ -87,7 +87,7 @@
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:gravity="center"
-            android:src="@drawable/ic_week" />
+            android:src="@drawable/wind_icon" />
 
         <TextView
             android:id="@+id/windTitle"
@@ -121,7 +121,8 @@
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:gravity="center"
-            android:src="@drawable/ic_week" />
+            android:src="@drawable/humidity_icon"
+            app:tint="#C74526" />
 
         <TextView
             android:id="@+id/humiTitle"
@@ -155,7 +156,7 @@
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:gravity="center"
-            android:src="@drawable/ic_week" />
+            android:src="@drawable/eye_icon" />
 
         <TextView
             android:id="@+id/visTitle"

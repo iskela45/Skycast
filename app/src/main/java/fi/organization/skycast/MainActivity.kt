@@ -42,7 +42,6 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var weatherViewModel: WeatherViewModel
     lateinit var weekViewModel: WeekViewModel
-    lateinit var settingsViewModel: SettingsViewModel
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
 
@@ -55,7 +54,6 @@ class MainActivity : AppCompatActivity() {
         // Create view model to share data to fragments
         weatherViewModel = ViewModelProvider(this).get(WeatherViewModel::class.java)
         weekViewModel = ViewModelProvider(this).get(WeekViewModel::class.java)
-        settingsViewModel = ViewModelProvider(this).get(SettingsViewModel::class.java)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         // ask for location permissions
@@ -143,6 +141,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateData(data: weatherResponse) {
         runOnUiThread() {
+            // TODO: Clean this shit up
             weatherViewModel.currentTemp.value = data.current.temp.toInt().toString() + degr
             weatherViewModel.currentDesc.value = data.current.weather[0].description
             weatherViewModel.currentFeel.value = data.current.feelsLike.toInt().toString() + degr
@@ -151,22 +150,18 @@ class MainActivity : AppCompatActivity() {
             weatherViewModel.currentVis.value = (data.current.visibility / 1000).toString() + dist
             // Put a list of 8 days into viewModel
             weekViewModel.dailyWeather.value = data.daily
+            weekViewModel.timezone.value = data.timezoneOffset
         }
     }
 
     // Used to replace and commit changes to frame
     private fun setCurrentFrag(fragment: Fragment) {
 
-        //Bundle
-        //val arguments = Bundle()
-        //arguments.putInt("VALUE1", 111)
-        //fragment.arguments = arguments
 
         // Replace replaces the current fragment with the given one
         // commit applies the change.
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.flFrag, fragment)
-            //addToBackStack(null)
             commit()
         }
     }
@@ -188,7 +183,6 @@ class MainActivity : AppCompatActivity() {
         speed = " mph"
         measurementSystem = "imperial"
         checkForPermissions(android.Manifest.permission.ACCESS_COARSE_LOCATION, "location", COARSE_LOCATION_RQ)
-
     }
 
     fun fetchJson( unitType: String, cords: Array<Double>) {

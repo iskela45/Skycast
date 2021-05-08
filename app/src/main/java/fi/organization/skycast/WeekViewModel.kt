@@ -12,4 +12,8 @@ class WeekViewModel : ViewModel() {
     val dailyWeather: MutableLiveData<List<Daily>> by lazy {
         MutableLiveData<List<Daily>>()
     }
+
+    val timezone: MutableLiveData<Int> by lazy {
+        MutableLiveData<Int>()
+    }
 }
