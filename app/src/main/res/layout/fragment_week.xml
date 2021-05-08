@@ -6,9 +6,42 @@
     tools:context=".WeekFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Week fragment" />
 
+    <!-- Makes the view scrollable -->
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Order the views vertically, create multiple instances of the view inside layout -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <include android:id="@+id/day0"
+                layout="@layout/day" />
+
+            <include android:id="@+id/day1"
+                layout="@layout/day" />
+
+            <include android:id="@+id/day2"
+                layout="@layout/day" />
+
+            <include android:id="@+id/day3"
+                layout="@layout/day" />
+
+            <include android:id="@+id/day4"
+                layout="@layout/day" />
+
+            <include android:id="@+id/day5"
+                layout="@layout/day" />
+
+            <include android:id="@+id/day6"
+                layout="@layout/day" />
+
+            <include android:id="@+id/day7"
+                layout="@layout/day" />
+
+        </LinearLayout>
+    </ScrollView>
 </FrameLayout>
