@@ -147,7 +147,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateData(data: weatherResponse) {
         runOnUiThread() {
-            // TODO: Clean this shit up
+            // TODO: Clean this shit up and pass unix time, create a class that the weatherViewModel can pass around.
             weatherViewModel.currentTemp.value = data.current.temp.toInt().toString() + degr
             weatherViewModel.currentDesc.value = data.current.weather[0].description
             weatherViewModel.currentFeel.value = data.current.feelsLike.toInt().toString() + degr
@@ -194,6 +194,7 @@ class MainActivity : AppCompatActivity() {
     fun fetchJson( unitType: String, cords: Array<Double>) {
         var lat = cords[0]
         var lon = cords[1]
+        // TODO: Hide the APIKey and generate a new one since this has gone to github.
         val url = "https://api.openweathermap.org/data/2.5/onecall?lat=$lat&lon=$lon&units=$unitType&exclude=hourly,minutely&appid=7900bd079ee8808aa0a42b4e13cf1c71"
 
         println("lat: $lat")
