@@ -13,4 +13,8 @@ class WeekViewModel : ViewModel() {
     val timezone: MutableLiveData<Int> by lazy {
         MutableLiveData<Int>()
     }
+
+    val suffixTemp: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
 }

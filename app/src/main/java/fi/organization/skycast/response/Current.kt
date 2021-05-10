@@ -25,7 +25,7 @@ class Current(
     @SerializedName("clouds")
     var clouds: Int = 0,
     @SerializedName("visibility")
-    var visibility: Int = 0,
+    var visibility: Double = 0.0,
     @SerializedName("wind_speed")
     var windSpeed: Double = 0.0,
     @SerializedName("wind_deg")

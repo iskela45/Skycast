@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.DataBindingUtil.setContentView
 import androidx.fragment.app.Fragment
@@ -20,41 +21,28 @@ class MainFrag : Fragment(R.layout.fragment_main) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Set title and subtitle
+        (activity as AppCompatActivity)?.supportActionBar?.title = "Skycast"
+        (activity as AppCompatActivity)?.supportActionBar?.subtitle = "Current weather"
 
-        // Observer to update temperature
-        model.currentTemp.observe(viewLifecycleOwner, Observer {
-            var view : TextView = view.findViewById(R.id.temp)
-            view.text = ("$it")
-        })
+        // Create views
+        val viewTemp : TextView = view.findViewById(R.id.temp)
+        val viewFeel : TextView = view.findViewById(R.id.feelsLike)
+        val viewDesc : TextView = view.findViewById(R.id.skyDesc)
+        val viewWind : TextView = view.findViewById(R.id.windVal)
+        val viewHumi : TextView = view.findViewById(R.id.humiVal)
+        val viewVisi : TextView = view.findViewById(R.id.visVal)
+        val viewTime : TextView = view.findViewById(R.id.updatedData)
 
-        // Observer to update temperature feel
-        model.currentFeel.observe(viewLifecycleOwner, Observer {
-            var view : TextView = view.findViewById(R.id.feelsLike)
-            view.text = "Feels like: $it"
-        })
 
-        // Observer to update description
-        model.currentDesc.observe(viewLifecycleOwner, Observer {
-            var view : TextView = view.findViewById(R.id.skyDesc)
-            view.text = it
-        })
-
-        // Observer to update wind
-        model.currentWind.observe(viewLifecycleOwner, Observer {
-            var view : TextView = view.findViewById(R.id.windVal)
-            view.text = it
-        })
-
-        // Observer to update humidity
-        model.currentHumi.observe(viewLifecycleOwner, Observer {
-            var view : TextView = view.findViewById(R.id.humiVal)
-            view.text = it
-        })
-
-        // Observer to update visibility
-        model.currentVis.observe(viewLifecycleOwner, Observer {
-            var view : TextView = view.findViewById(R.id.visVal)
-            view.text = it
+        model.currentWeather.observe(viewLifecycleOwner, Observer {
+            viewTemp.text = (it.temp.toInt().toString() + model.suffixTemp.value)
+            viewFeel.text = (it.feelsLike.toInt().toString() + model.suffixTemp.value)
+            viewDesc.text = it.weather[0].description
+            viewWind.text = (String.format("%.1f", it.windSpeed) + model.suffixSpeed.value)
+            viewHumi.text = (it.humidity.toString() + "%")
+            viewVisi.text = (String.format("%.1f", it.visibility) + model.suffixDist.value)
+            viewTime.text = timeFormat(it.dt, model.timezone.value ?: 0, true)
         })
     }
 }

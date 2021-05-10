@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 
@@ -18,6 +19,10 @@ class WeekFragment : Fragment(R.layout.fragment_week) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Set title and subtitle
+        (activity as AppCompatActivity)?.supportActionBar?.title = "Skycast"
+        (activity as AppCompatActivity)?.supportActionBar?.subtitle = "Upcoming weather"
 
         model.dailyWeather.observe(viewLifecycleOwner, Observer {
             for ((i, day) in it.withIndex()) {
@@ -32,9 +37,9 @@ class WeekFragment : Fragment(R.layout.fragment_week) {
                 var icon : ImageView = card.findViewById(R.id.imageView_condition_icon)
 
                 // Assign values to the views
-                temp.text = day.temp.max.toInt().toString() + "°C"
+                temp.text = (day.temp.max.toInt().toString() + model.suffixTemp.value)
                 desc.text = day.weather[0].description
-                date.text = timeFormat(day.dt, model.timezone.value ?: 0)
+                date.text = dateFormat(day.dt, model.timezone.value ?: 0)
                 icon.setImageResource(getImage(day.weather[0].icon))
             }
         })

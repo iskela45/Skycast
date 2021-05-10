@@ -2,37 +2,31 @@ package fi.organization.skycast
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import fi.organization.skycast.response.Current
+import fi.organization.skycast.response.Daily
 
 class WeatherViewModel : ViewModel() {
     //var temp : Int = 0
     //var desc : String = "error connecting to OpenWeather"
 
 
-    val currentTemp: MutableLiveData<String> by lazy {
+    val currentWeather: MutableLiveData<Current> by lazy {
+        MutableLiveData<Current>()
+    }
+
+    val suffixTemp: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
     }
 
-    val currentFeel: MutableLiveData<String> by lazy {
+    val suffixSpeed: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
     }
 
-    val currentDesc: MutableLiveData<String> by lazy {
+    val suffixDist: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
     }
 
-    val currentWind: MutableLiveData<String> by lazy {
-        MutableLiveData<String>()
-    }
-
-    val currentHumi: MutableLiveData<String> by lazy {
-        MutableLiveData<String>()
-    }
-
-    val currentVis: MutableLiveData<String> by lazy {
-        MutableLiveData<String>()
-    }
-
-    val currentIcon: MutableLiveData<String> by lazy {
-        MutableLiveData<String>()
+    val timezone: MutableLiveData<Int> by lazy {
+        MutableLiveData<Int>()
     }
 }

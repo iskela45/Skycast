@@ -1,5 +1,8 @@
 package fi.organization.skycast
 
+import java.text.SimpleDateFormat
+import java.util.*
+
 /** This file includes functions that'll be needed in multiple classes. */
 
 /**
@@ -8,11 +11,48 @@ package fi.organization.skycast
  * @param dt Unix timestamp
  * @param offset Unix timestamp timezone offset
  */
-fun timeFormat(dt: Int, offset: Int): String {
+fun dateFormat(dt: Int, offset: Int): String {
     var t = java.time.format.DateTimeFormatter.ISO_INSTANT
         .format(java.time.Instant.ofEpochSecond(dt.toLong() + offset.toLong()))
 
     return t.split("T")[0]
+}
+
+/**
+ * Convert a given distance in metres to distance in km or miles.
+ *
+ * @param distance distance to be converted (in metres)
+ * @param newFormat String that assigns the desired conversion.
+ */
+fun distanceConverter(distance: Double, newFormat: String) : Double =
+    when (newFormat) {
+        " km" -> distance / 1000.0
+        " miles" -> distance * 0.00062137
+        else -> distance
+    }
+
+/**
+ * Convert Unix time to a DateTime format,
+ * Then split at T and only return substring containing hours and minutes.
+ *
+ * @param dt Unix timestamp
+ * @param offset Unix timestamp timezone offset
+ */
+fun timeFormat(dt: Int, offset: Int, isoTime: Boolean): String {
+    var t = java.time.format.DateTimeFormatter.ISO_INSTANT
+        .format(java.time.Instant.ofEpochSecond(dt.toLong() + offset.toLong()))
+
+
+
+    var time = t.split("T")[1].substring(0, 5)
+    //val clock24 = SimpleDateFormat("HH:mm")
+    //val clock12 = SimpleDateFormat("hh:mm a")
+    //val ret: Date = clock24.parse(time)
+
+    println("dt: $dt")
+    println("tz: $offset")
+    println("t: $time")
+    return time
 }
 
 /**

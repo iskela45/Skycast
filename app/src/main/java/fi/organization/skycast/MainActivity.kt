@@ -36,9 +36,11 @@ class MainActivity : AppCompatActivity() {
     // TODO: Subtitle
     // TODO: Settings
     // TODO: city api?
+    // TODO: Imperial AM/PM?
     val mainFrag = MainFrag()
     val weekFrag = WeekFragment()
     val settingsFrag = SettingsFrag()
+    val preferencesFrag = PreferencesFrag()
     var measurementSystem = "metric"
     var dist = " km"
     var degr = "°C"
@@ -74,7 +76,8 @@ class MainActivity : AppCompatActivity() {
             when(it.itemId) {
                 R.id.miMain -> setCurrentFrag(mainFrag)
                 R.id.miWeek -> setCurrentFrag(weekFrag)
-                R.id.miSettings -> setCurrentFrag(settingsFrag)
+                R.id.miSettings -> setCurrentFrag(preferencesFrag)
+                //R.id.miSettings -> setCurrentFrag(settingsFrag)
             }
             // lambda excepts to return true
             true
@@ -147,16 +150,25 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateData(data: weatherResponse) {
         runOnUiThread() {
-            // TODO: Clean this shit up and pass unix time, create a class that the weatherViewModel can pass around.
-            weatherViewModel.currentTemp.value = data.current.temp.toInt().toString() + degr
-            weatherViewModel.currentDesc.value = data.current.weather[0].description
-            weatherViewModel.currentFeel.value = data.current.feelsLike.toInt().toString() + degr
-            weatherViewModel.currentWind.value = data.current.windSpeed.toString() + speed
-            weatherViewModel.currentHumi.value = data.current.humidity.toString() + "%"
-            weatherViewModel.currentVis.value = (data.current.visibility / 1000).toString() + dist
-            // Put a list of 8 days into viewModel
-            weekViewModel.dailyWeather.value = data.daily
+
+            // Convert visibility distance from metres to km or miles
+            data.current.visibility = distanceConverter(data.current.visibility, dist)
+
+            // Put data type suffixes into the weatherViewModel
+            weatherViewModel.suffixDist.value = dist
+            weatherViewModel.suffixSpeed.value = speed
+            weatherViewModel.suffixTemp.value = degr
+
+            // Put temperature suffix into the weekViewModel
+            weekViewModel.suffixTemp.value = degr
+
+            // Put weather and timezone data into the weatherViewModel
+            weatherViewModel.timezone.value = data.timezoneOffset
+            weatherViewModel.currentWeather.value = data.current
+
+            // Put timezone and a list of 8 days into viewModel
             weekViewModel.timezone.value = data.timezoneOffset
+            weekViewModel.dailyWeather.value = data.daily
         }
     }
 
@@ -173,7 +185,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun checkMetric(v: View) {
-        println("main metric")
         dist = " km"
         degr = "°C"
         speed = " m/s"
@@ -183,7 +194,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun checkImperial(v: View) {
-        println("main imp")
         dist = " miles"
         degr = "°F"
         speed = " mph"
@@ -196,6 +206,7 @@ class MainActivity : AppCompatActivity() {
         var lon = cords[1]
         // TODO: Hide the APIKey and generate a new one since this has gone to github.
         val url = "https://api.openweathermap.org/data/2.5/onecall?lat=$lat&lon=$lon&units=$unitType&exclude=hourly,minutely&appid=7900bd079ee8808aa0a42b4e13cf1c71"
+        println("url: $url")
 
         println("lat: $lat")
         println("lon: $lon")
@@ -213,6 +224,7 @@ class MainActivity : AppCompatActivity() {
                 // create a variable from weatherResponse and the response body using gson
                 val weatherObj = gson.fromJson(body, weatherResponse::class.java)
 
+                // Send the data to the viewModels
                 updateData(weatherObj)
             }
 
