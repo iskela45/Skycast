@@ -1,35 +1,31 @@
 package fi.organization.skycast
 
-import android.Manifest
+import android.content.SharedPreferences
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.widget.RadioButton
-import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModel
+import androidx.preference.PreferenceManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.gson.GsonBuilder
-import com.vmadalin.easypermissions.EasyPermissions
 import fi.organization.skycast.cityCoordinatesResponse.cityCords
 import fi.organization.skycast.response.weatherResponse
 import okhttp3.*
 import java.io.IOException
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
     // TODO: Set "sensible" default values for all fragment views.
     // TODO: refresh weather data
@@ -49,22 +45,35 @@ class MainActivity : AppCompatActivity() {
     lateinit var weatherViewModel: WeatherViewModel
     lateinit var weekViewModel: WeekViewModel
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    var savedFrag = "main"
+
+    lateinit var bottomNavigationView: BottomNavigationView
+
+    //private var listener: OnSharedPreferenceChangeListener? = null
+    //lateinit var var prefs = PreferenceManager.getDefaultSharedPreferences(this)
+    //var prefs = PreferenceManager.getDefaultSharedPreferences(this)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        registerPreferenceListener()
+
         setContentView(R.layout.activity_main)
         //title = "Hello StackOverflow"
         supportActionBar?.subtitle = "Your location"
-        val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottomNavigationView)
+        bottomNavigationView = findViewById(R.id.bottomNavigationView)
 
         // Create view model to share data to fragments
         weatherViewModel = ViewModelProvider(this).get(WeatherViewModel::class.java)
         weekViewModel = ViewModelProvider(this).get(WeekViewModel::class.java)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        // ask for location permissions
-        checkForPermissions(android.Manifest.permission.ACCESS_COARSE_LOCATION, "location", COARSE_LOCATION_RQ)
+
+        // Read unit preferences from settings, metric by default.
+        var prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        var unitPref = prefs?.getString("MEASUREMENTS", "metric")
+        if (unitPref == "imperial") checkImperial() else checkMetric()
 
 
         // Start with main fragment
@@ -85,10 +94,29 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun getCords() {
-        // Create location service client
+    override fun onDestroy() {
+        unregisterPreferenceListener()
+        super.onDestroy()
+    }
 
+    override fun onResume() {
+        super.onResume()
+        supportFragmentManager.popBackStack()
+        println("nav: ${bottomNavigationView.selectedItemId}")
 
+        //when (savedFrag) {
+        //    "mainFrag" -> setCurrentFrag(mainFrag)
+        //    "weekFrag" -> setCurrentFrag(weekFrag)
+        //    "preferencesFrag" -> setCurrentFrag(preferencesFrag)
+        //}
+    }
+
+    override fun onPause() {
+        supportFragmentManager.beginTransaction().apply {
+            addToBackStack(null)
+            commit()
+        }
+        super.onPause()
     }
 
     private fun checkForPermissions(permission: String, name: String, requestCode: Int) {
@@ -99,7 +127,7 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(applicationContext, "Checking location data", Toast.LENGTH_SHORT).show()
                     // ask location
                     fusedLocationClient.lastLocation
-                        .addOnSuccessListener { location : Location? ->
+                        .addOnSuccessListener { location: Location? ->
                             // Put latitude and longitude into an array
                             // 0.0 if location data is null
                             var locArray = arrayOf<Double>(
@@ -112,7 +140,11 @@ class MainActivity : AppCompatActivity() {
                         }
 
                 }
-                shouldShowRequestPermissionRationale(permission) -> showDialog(permission, name, requestCode)
+                shouldShowRequestPermissionRationale(permission) -> showDialog(
+                    permission,
+                    name,
+                    requestCode
+                )
 
                 else -> ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)
             }
@@ -125,14 +157,22 @@ class MainActivity : AppCompatActivity() {
             setMessage("This app requires your location data to function properly")
             setTitle("Permission required")
             setPositiveButton("OK") { dialog, which ->
-                ActivityCompat.requestPermissions(this@MainActivity, arrayOf(permission), requestCode)
+                ActivityCompat.requestPermissions(
+                    this@MainActivity,
+                    arrayOf(permission),
+                    requestCode
+                )
             }
         }
         val dialog = builder.create()
         dialog.show()
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         fun innerCheck(name: String) {
             if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
@@ -173,8 +213,6 @@ class MainActivity : AppCompatActivity() {
 
     // Used to replace and commit changes to frame
     private fun setCurrentFrag(fragment: Fragment) {
-
-
         // Replace replaces the current fragment with the given one
         // commit applies the change.
         supportFragmentManager.beginTransaction().apply {
@@ -183,24 +221,32 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun checkMetric(v: View) {
+    fun checkMetric() {
         dist = " km"
         degr = "°C"
         speed = " m/s"
         measurementSystem = "metric"
-        checkForPermissions(android.Manifest.permission.ACCESS_COARSE_LOCATION, "location", COARSE_LOCATION_RQ)
+        checkForPermissions(
+            android.Manifest.permission.ACCESS_COARSE_LOCATION,
+            "location",
+            COARSE_LOCATION_RQ
+        )
 
     }
 
-    fun checkImperial(v: View) {
+    fun checkImperial() {
         dist = " miles"
         degr = "°F"
         speed = " mph"
         measurementSystem = "imperial"
-        checkForPermissions(android.Manifest.permission.ACCESS_COARSE_LOCATION, "location", COARSE_LOCATION_RQ)
+        checkForPermissions(
+            android.Manifest.permission.ACCESS_COARSE_LOCATION,
+            "location",
+            COARSE_LOCATION_RQ
+        )
     }
 
-    fun fetchJson( unitType: String, cords: Array<Double>) {
+    fun fetchJson(unitType: String, cords: Array<Double>) {
         var lat = cords[0]
         var lon = cords[1]
         // TODO: Hide the APIKey and generate a new one since this has gone to github.
@@ -237,7 +283,7 @@ class MainActivity : AppCompatActivity() {
     /**
      * Used with another openWeather Api to get the coordinates of a given city.
      */
-    fun fetchCityCords() {
+    public fun fetchCityCords() {
         val url = "https://api.openweathermap.org/data/2.5/weather?q=tampere&appid=7900bd079ee8808aa0a42b4e13cf1c71"
 
         val request = Request.Builder().url(url).build()
@@ -265,4 +311,27 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+
+    private fun registerPreferenceListener() {
+        PreferenceManager.getDefaultSharedPreferences(this)
+            .registerOnSharedPreferenceChangeListener(this)
+    }
+
+    private fun unregisterPreferenceListener() {
+        PreferenceManager.getDefaultSharedPreferences(this)
+            .unregisterOnSharedPreferenceChangeListener(this)
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        if (key == "MEASUREMENTS") {
+            println(sharedPreferences.toString())
+            var x = sharedPreferences?.getString("MEASUREMENTS", "metric")
+            println(x)
+            println("REEEEEEEEEEEEEEE")
+            if (x == "imperial") checkImperial() else checkMetric()
+        }
+    }
+
+
+
 }
