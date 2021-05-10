@@ -32,11 +32,10 @@ import java.io.IOException
 class MainActivity : AppCompatActivity() {
 
     // TODO: Set "sensible" default values for all fragment views.
-    // TODO: Mainfrag refresh time
-    // TODO: Subtitle
-    // TODO: Settings
-    // TODO: city api?
+    // TODO: refresh weather data
+    // TODO: city api? probably not
     // TODO: Imperial AM/PM?
+    // TODO: Settings listener
     val mainFrag = MainFrag()
     val weekFrag = WeekFragment()
     val settingsFrag = SettingsFrag()
