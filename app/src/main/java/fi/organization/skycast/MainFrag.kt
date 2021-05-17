@@ -37,7 +37,7 @@ class MainFrag : Fragment(R.layout.fragment_main) {
 
         model.currentWeather.observe(viewLifecycleOwner, Observer {
             viewTemp.text = (it.temp.toInt().toString() + model.suffixTemp.value)
-            viewFeel.text = (it.feelsLike.toInt().toString() + model.suffixTemp.value)
+            viewFeel.text = ("Feels like: " + (it.feelsLike.toInt().toString() + model.suffixTemp.value))
             viewDesc.text = it.weather[0].description
             viewWind.text = (String.format("%.1f", it.windSpeed) + model.suffixSpeed.value)
             viewHumi.text = (it.humidity.toString() + "%")

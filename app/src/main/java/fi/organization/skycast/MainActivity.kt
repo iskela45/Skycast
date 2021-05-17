@@ -29,12 +29,9 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
     // TODO: Set "sensible" default values for all fragment views.
     // TODO: refresh weather data
-    // TODO: city api? probably not
     // TODO: Imperial AM/PM?
-    // TODO: Settings listener
     val mainFrag = MainFrag()
     val weekFrag = WeekFragment()
-    val settingsFrag = SettingsFrag()
     val preferencesFrag = PreferencesFrag()
     var measurementSystem = "metric"
     var dist = " km"
@@ -45,7 +42,6 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
     lateinit var weatherViewModel: WeatherViewModel
     lateinit var weekViewModel: WeekViewModel
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    var savedFrag = "main"
 
     lateinit var bottomNavigationView: BottomNavigationView
 
@@ -55,12 +51,13 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        println("CREATED")
         super.onCreate(savedInstanceState)
 
         registerPreferenceListener()
 
         setContentView(R.layout.activity_main)
-        //title = "Hello StackOverflow"
+
         supportActionBar?.subtitle = "Your location"
         bottomNavigationView = findViewById(R.id.bottomNavigationView)
 
@@ -75,18 +72,33 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         var unitPref = prefs?.getString("MEASUREMENTS", "metric")
         if (unitPref == "imperial") checkImperial() else checkMetric()
 
-
         // Start with main fragment
         setCurrentFrag(mainFrag)
 
-        // select fragment based on ID
+        // Create preference editor
+        var prefsEditor = prefs.edit()
+        // Set mainFrag as the default fragment when the app is started.
+        prefsEditor.putString("FRAGMENT", "mainFrag")
+
+        // Select fragment based on ID and save the current fragment into preferences.
+        // Preference value gets read in onResume()
         bottomNavigationView.setOnNavigationItemSelectedListener {
             when(it.itemId) {
-                R.id.miMain -> setCurrentFrag(mainFrag)
-                R.id.miWeek -> setCurrentFrag(weekFrag)
-                R.id.miSettings -> setCurrentFrag(preferencesFrag)
+                R.id.miMain -> {
+                    setCurrentFrag(mainFrag)
+                    prefsEditor.putString("FRAGMENT", "mainFrag")
+                }
+                R.id.miWeek -> {
+                    setCurrentFrag(weekFrag)
+                    prefsEditor.putString("FRAGMENT", "weekFrag")
+                }
+                R.id.miSettings -> {
+                    setCurrentFrag(preferencesFrag)
+                    prefsEditor.putString("FRAGMENT", "preferencesFrag")
+                }
                 //R.id.miSettings -> setCurrentFrag(settingsFrag)
             }
+            prefsEditor.commit()
             // lambda excepts to return true
             true
         }
@@ -99,24 +111,18 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         super.onDestroy()
     }
 
+    // Load most recent fragment from preferences
     override fun onResume() {
-        super.onResume()
-        supportFragmentManager.popBackStack()
-        println("nav: ${bottomNavigationView.selectedItemId}")
+        var prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        var prefFrag = prefs?.getString("FRAGMENT", "mainFrag")
 
-        //when (savedFrag) {
-        //    "mainFrag" -> setCurrentFrag(mainFrag)
-        //    "weekFrag" -> setCurrentFrag(weekFrag)
-        //    "preferencesFrag" -> setCurrentFrag(preferencesFrag)
-        //}
-    }
-
-    override fun onPause() {
-        supportFragmentManager.beginTransaction().apply {
-            addToBackStack(null)
-            commit()
+        when (prefFrag) {
+            "mainFrag" -> bottomNavigationView.selectedItemId = R.id.miMain
+            "weekFrag" -> bottomNavigationView.selectedItemId = R.id.miWeek
+            "preferencesFrag" -> bottomNavigationView.selectedItemId = R.id.miSettings
         }
-        super.onPause()
+
+        super.onResume()
     }
 
     private fun checkForPermissions(permission: String, name: String, requestCode: Int) {
@@ -280,38 +286,6 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         })
     }
 
-    /**
-     * Used with another openWeather Api to get the coordinates of a given city.
-     */
-    public fun fetchCityCords() {
-        val url = "https://api.openweathermap.org/data/2.5/weather?q=tampere&appid=7900bd079ee8808aa0a42b4e13cf1c71"
-
-        val request = Request.Builder().url(url).build()
-        val client = OkHttpClient()
-        client.newCall(request).enqueue(object : Callback {
-            override fun onResponse(call: Call, response: Response) {
-                val body = response?.body?.string()
-
-                // Create gson
-                val gson = GsonBuilder().create()
-
-                // create a variable from cityCords and the response body using gson
-                val cityObj = gson.fromJson(body, cityCords::class.java)
-                //println("City name: " + cityObj.name)
-                //println("latitude: " + cityObj.coord.lat)
-                //println("longitude: " + cityObj.coord.lon)
-                var loc = arrayOf<Double>(cityObj.coord.lat, cityObj.coord.lon)
-                fetchJson("metric", loc)
-            }
-
-            // Triggered if the request fails
-            override fun onFailure(call: Call, e: IOException) {
-                println("Failed to execute city request")
-                fetchJson("metric", arrayOf<Double>(0.0, 0.0))
-            }
-        })
-    }
-
     private fun registerPreferenceListener() {
         PreferenceManager.getDefaultSharedPreferences(this)
             .registerOnSharedPreferenceChangeListener(this)
@@ -324,10 +298,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         if (key == "MEASUREMENTS") {
-            println(sharedPreferences.toString())
             var x = sharedPreferences?.getString("MEASUREMENTS", "metric")
-            println(x)
-            println("REEEEEEEEEEEEEEE")
             if (x == "imperial") checkImperial() else checkMetric()
         }
     }
