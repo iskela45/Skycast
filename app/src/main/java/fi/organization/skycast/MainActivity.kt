@@ -262,9 +262,6 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
                         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
                     }
                 }
-                val prefs = PreferenceManager.getDefaultSharedPreferences(this)
-                val unitPref = prefs?.getString("MEASUREMENTS", "metric")
-                if (unitPref == "imperial") checkImperial() else checkMetric()
             }
         }
 
@@ -316,18 +313,15 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
         // API_KEY is found in local.properties.
         val url = "https://api.openweathermap.org/data/2.5/onecall?lat=$lat&lon=$lon&units=$unitType&exclude=hourly,minutely&appid=${BuildConfig.API_KEY}"
-        //println("url: $url")
 
-        //println("lat: $lat")
-        //println("lon: $lon")
-
+        //Create and use OkHttpClient.
         val request = Request.Builder().url(url).build()
         val client = OkHttpClient()
 
         client.newCall(request).enqueue(object : Callback {
             // Called when a response is successfully received.
             override fun onResponse(call: Call, response: Response) {
-                // Stop swipe refresh animation and toast
+                // Stop swipe refresh animation and toast.
                 if (swipeRefresh.isRefreshing) {
                     swipeRefresh.isRefreshing = false
                     runOnUiThread() { Toast.makeText(applicationContext, "Refresh successful", Toast.LENGTH_SHORT).show() }
@@ -363,17 +357,15 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
             // Convert visibility distance from metres to km or miles
             data.current.visibility = distanceConverter(data.current.visibility, dist)
 
-            // Put data type suffixes into the weatherViewModel
+            // Put data type suffixes, weather and timezone into the weatherViewModel
             weatherViewModel.suffixDist.value = dist
             weatherViewModel.suffixSpeed.value = speed
             weatherViewModel.suffixTemp.value = degr
-            // Put weather and timezone data into the weatherViewModel
             weatherViewModel.timezone.value = data.timezoneOffset
             weatherViewModel.currentWeather.value = data.current
 
-            // Put temperature suffix into the weekViewModel
+            // Put temperature suffixes, weather for 8 days and timezone into the weekViewModel
             weekViewModel.suffixTemp.value = degr
-            // Put timezone and a list of 8 days into viewModel
             weekViewModel.timezone.value = data.timezoneOffset
             weekViewModel.dailyWeather.value = data.daily
         }
