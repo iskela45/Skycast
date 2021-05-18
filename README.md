@@ -23,3 +23,11 @@ Every feature described above has been implemented, a few bugs and some code cle
 * Large scale codebase cleanup.
 * More documentation for the codebase.
 * Reopening the app now puts the user in the same fragment where they left off.
+
+## Build instructions
+If you plan on building the app yourself include your own openWeather API key in the local.properties file.
+Example local.properties file:
+```
+sdk.dir=D\:\\androidSDK
+API_KEY=YOUR_API_KEY_HERE
+```
