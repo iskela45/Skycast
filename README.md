@@ -38,3 +38,6 @@ Example local.properties file:
 sdk.dir=D\:\\androidSDK
 API_KEY=YOUR_API_KEY_HERE
 ```
+
+## Screencast
+[![Screencast](https://img.youtube.com/vi/Eco2waQU-64/0.jpg)](https://www.youtube.com/watch?v=Eco2waQU-64)
