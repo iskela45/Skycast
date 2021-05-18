@@ -144,6 +144,18 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
     }
 
     /**
+     * Replace the current fragment with a new one.
+     *
+     * @param fragment the new fragment the UI will switch to.
+     */
+    private fun setCurrentFrag(fragment: Fragment) {
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.flFrag, fragment)
+            commit()
+        }
+    }
+
+    /**
      * Unregister preference listener.
      */
     override fun onDestroy() {
@@ -177,18 +189,6 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         )
 
         super.onResume()
-    }
-
-    /**
-     * Replace the current fragment with a new one.
-     *
-     * @param fragment the new fragment the UI will switch to.
-     */
-    private fun setCurrentFrag(fragment: Fragment) {
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.flFrag, fragment)
-            commit()
-        }
     }
 
     /**
