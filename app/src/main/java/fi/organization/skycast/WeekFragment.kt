@@ -1,22 +1,23 @@
 package fi.organization.skycast
 
-import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 
 class WeekFragment : Fragment(R.layout.fragment_week) {
 
+    // Create ViewModel
     private val model : WeekViewModel by activityViewModels()
 
+    /**
+     * Update title and subtitle
+     * Create viewModel liveData observer that updates the UI with new data
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -24,6 +25,8 @@ class WeekFragment : Fragment(R.layout.fragment_week) {
         (activity as AppCompatActivity)?.supportActionBar?.title = "Skycast"
         (activity as AppCompatActivity)?.supportActionBar?.subtitle = "Upcoming weather"
 
+        // Observer checking currentWeather liveData for changes.
+        // If changes occur iterate through all day.xml views with up-to-date data
         model.dailyWeather.observe(viewLifecycleOwner, Observer {
             for ((i, day) in it.withIndex()) {
                 // Select a card corresponding to a day based on the iteration.

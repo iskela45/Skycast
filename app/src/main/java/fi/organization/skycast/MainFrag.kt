@@ -1,23 +1,22 @@
 package fi.organization.skycast
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
-import androidx.databinding.DataBindingUtil.setContentView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import fi.organization.skycast.databinding.ActivityMainBinding
-import fi.organization.skycast.databinding.FragmentMainBinding
-import fi.organization.skycast.response2.weatherResponse
 
 class MainFrag : Fragment(R.layout.fragment_main) {
+
+    // Create ViewModel
     private val model : WeatherViewModel by activityViewModels()
 
+    /**
+     * Update title and subtitle
+     * Create viewModel liveData observer that updates the UI with new data
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -34,7 +33,8 @@ class MainFrag : Fragment(R.layout.fragment_main) {
         val viewVisi : TextView = view.findViewById(R.id.visVal)
         val viewTime : TextView = view.findViewById(R.id.updatedData)
 
-
+        // Observer checking currentWeather liveData for changes.
+        // If changes occur updates textViews with up-to-date data
         model.currentWeather.observe(viewLifecycleOwner, Observer {
             viewTemp.text = (it.temp.toInt().toString() + model.suffixTemp.value)
             viewFeel.text = ("Feels like: " + (it.feelsLike.toInt().toString() + model.suffixTemp.value))

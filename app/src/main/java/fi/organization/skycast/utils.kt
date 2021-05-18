@@ -1,8 +1,5 @@
 package fi.organization.skycast
 
-import java.text.SimpleDateFormat
-import java.util.*
-
 /** This file includes functions that'll be needed in multiple classes. */
 
 /**
@@ -42,17 +39,7 @@ fun timeFormat(dt: Int, offset: Int, isoTime: Boolean): String {
     var t = java.time.format.DateTimeFormatter.ISO_INSTANT
         .format(java.time.Instant.ofEpochSecond(dt.toLong() + offset.toLong()))
 
-
-
-    var time = t.split("T")[1].substring(0, 5)
-    //val clock24 = SimpleDateFormat("HH:mm")
-    //val clock12 = SimpleDateFormat("hh:mm a")
-    //val ret: Date = clock24.parse(time)
-
-    println("dt: $dt")
-    println("tz: $offset")
-    println("t: $time")
-    return time
+    return t.split("T")[1].substring(0, 5)
 }
 
 /**

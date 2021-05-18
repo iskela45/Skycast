@@ -3,7 +3,6 @@ package fi.organization.skycast
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.content.pm.PackageManager
-import android.location.Location
 import android.os.Bundle
 import android.os.Looper
 import android.widget.Toast
@@ -16,7 +15,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.gms.location.*
-import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.gson.GsonBuilder
 import fi.organization.skycast.response.weatherResponse
@@ -26,26 +24,37 @@ import java.io.IOException
 
 class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
+    // TODO: clean up dependencies.
+    // Fragments
     private val mainFrag = MainFrag()
     private val weekFrag = WeekFragment()
     private val preferencesFrag = PreferencesFrag()
+    // Measurement units that'll be sent to fragments
     var dist = " km"
     var degr = "°C"
     var speed = " m/s"
+
     private val COARSE_LOCATION_RQ = 101
 
+    // ViewModels
     lateinit var weatherViewModel: WeatherViewModel
     lateinit var weekViewModel: WeekViewModel
+
+    // Google play services fusedLocationClient for location data
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    // SwipeRefreshLayout for refreshing the app with new data.
     private lateinit var swipeRefresh: SwipeRefreshLayout
 
     lateinit var bottomNavigationView: BottomNavigationView
     lateinit var prefs : SharedPreferences
     lateinit var locationRequest: LocationRequest
 
+    /**
+     * Used when requesting to start location updates.
+     * Updates the current data when first loaded, then start updating new data to preferences.
+     */
     private var locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
-            if (locationResult == null) return
 
             // Call fetchJson using the latest location result, if the list is empty use 0.0
             val loc = locationResult.locations.lastOrNull()
@@ -69,10 +78,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         super.onCreate(savedInstanceState)
 
         registerPreferenceListener()
-
         setContentView(R.layout.activity_main)
-
-        supportActionBar?.subtitle = "Your location"
         bottomNavigationView = findViewById(R.id.bottomNavigationView)
 
         // Create view model to share data to fragments
@@ -89,15 +95,14 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
         // Read unit preferences from settings, metric by default.
         prefs = PreferenceManager.getDefaultSharedPreferences(this)
-        val unitPref = prefs?.getString("MEASUREMENTS", "metric")
+        val unitPref = prefs.getString("MEASUREMENTS", "metric")
         if (unitPref == "imperial") checkImperial() else checkMetric()
 
         // Start with main fragment
         setCurrentFrag(mainFrag)
 
-        // Create preference editor
+        // Create preference editor and set mainFrag as the default fragment when the app starts.
         val prefsEditor = prefs.edit()
-        // Set mainFrag as the default fragment when the app is started.
         prefsEditor.putString("FRAGMENT", "mainFrag")
 
         // Select fragment based on ID and save the current fragment into preferences.
@@ -116,7 +121,6 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
                     setCurrentFrag(preferencesFrag)
                     prefsEditor.putString("FRAGMENT", "preferencesFrag")
                 }
-                //R.id.miSettings -> setCurrentFrag(settingsFrag)
             }
             prefsEditor.apply()
             // lambda excepts to return true
@@ -126,16 +130,22 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         // Set swipe to refresh view to call for a new json.
         swipeRefresh = findViewById(R.id.swipeRefresh)
         swipeRefresh.setOnRefreshListener {
-            val unitPref = prefs?.getString("MEASUREMENTS", "metric")
+            val unitPref = prefs.getString("MEASUREMENTS", "metric")
             if (unitPref == "imperial") checkImperial() else checkMetric()
         }
     }
 
+    /**
+     * Unregister preference listener.
+     */
     override fun onDestroy() {
         unregisterPreferenceListener()
         super.onDestroy()
     }
 
+    /**
+     * Stop listening to location updates when the app isn't being used.
+     */
     override fun onPause() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
         super.onPause()
@@ -146,8 +156,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
      * Restart locationUpdates by checking for permissions and then calling requestLocationUpdates()
      */
     override fun onResume() {
-
-        when (prefs?.getString("FRAGMENT", "mainFrag")) {
+        when (prefs.getString("FRAGMENT", "mainFrag")) {
             "mainFrag" -> bottomNavigationView.selectedItemId = R.id.miMain
             "weekFrag" -> bottomNavigationView.selectedItemId = R.id.miWeek
             "preferencesFrag" -> bottomNavigationView.selectedItemId = R.id.miSettings
@@ -163,6 +172,18 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
     }
 
     /**
+     * Replace the current fragment with a new one.
+     *
+     * @param fragment the new fragment the UI will switch to.
+     */
+    private fun setCurrentFrag(fragment: Fragment) {
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.flFrag, fragment)
+            commit()
+        }
+    }
+
+    /**
      * If permissions are granted start locationUpdates.
      * If permissions aren't granted ask for permissions.
      *
@@ -172,10 +193,12 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
      */
     private fun checkForPermissions(permission: String, name: String, requestCode: Int) {
         when {
+            // Start requesting locationUpdates.
             ContextCompat.checkSelfPermission(applicationContext, permission) == PackageManager.PERMISSION_GRANTED -> {
-                // ask location
                 fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
             }
+
+            // Open dialog box asking the user for permission
             shouldShowRequestPermissionRationale(permission) -> showDialog(
                     permission,
                     name,
@@ -224,6 +247,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
                 Toast.makeText(applicationContext, "$name permission refused", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(applicationContext, "$name permission granted", Toast.LENGTH_SHORT).show()
+
                 // Load measurement system setting and update data if the permission is successful
                 val prefs = PreferenceManager.getDefaultSharedPreferences(this)
                 val unitPref = prefs?.getString("MEASUREMENTS", "metric")
@@ -233,47 +257,6 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
         when (requestCode) {
             COARSE_LOCATION_RQ -> innerCheck("location")
-        }
-    }
-
-    /**
-     * Receives data that is then updated for the weatherViewModel and weekViewModel.
-     * The viewModels use liveData to keep the UI up to date with listeners in fragments.
-     *
-     * @param data is an object containing all of the weather data
-     */
-    private fun updateData(data: weatherResponse) {
-        runOnUiThread() {
-            // Convert visibility distance from metres to km or miles
-            data.current.visibility = distanceConverter(data.current.visibility, dist)
-
-            // Put data type suffixes into the weatherViewModel
-            weatherViewModel.suffixDist.value = dist
-            weatherViewModel.suffixSpeed.value = speed
-            weatherViewModel.suffixTemp.value = degr
-            // Put weather and timezone data into the weatherViewModel
-            weatherViewModel.timezone.value = data.timezoneOffset
-            weatherViewModel.currentWeather.value = data.current
-
-            // Put temperature suffix into the weekViewModel
-            weekViewModel.suffixTemp.value = degr
-            // Put timezone and a list of 8 days into viewModel
-            weekViewModel.timezone.value = data.timezoneOffset
-            weekViewModel.dailyWeather.value = data.daily
-        }
-    }
-
-    /**
-     * Replace the current fragment with a new one.
-     *
-     * @param fragment the new fragment the UI will switch to.
-     */
-    private fun setCurrentFrag(fragment: Fragment) {
-        // Replace replaces the current fragment with the given one
-        // commit applies the change.
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.flFrag, fragment)
-            commit()
         }
     }
 
@@ -290,7 +273,6 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         val prefLat : Double = prefs?.getString("LAT", "0")?.toDouble() ?: 0.0
         val prefLon : Double = prefs?.getString("LON", "0")?.toDouble() ?: 0.0
         fetchJson(prefLat, prefLon)
-
     }
 
     /**
@@ -306,7 +288,6 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         val prefLat : Double = prefs?.getString("LAT", "0")?.toDouble() ?: 0.0
         val prefLon : Double = prefs?.getString("LON", "0")?.toDouble() ?: 0.0
         fetchJson(prefLat, prefLon)
-
     }
 
     /**
@@ -333,16 +314,16 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         client.newCall(request).enqueue(object : Callback {
             // Called when a response is successfully received.
             override fun onResponse(call: Call, response: Response) {
-                // Stop swipe refresh animation
-                if (swipeRefresh.isRefreshing) swipeRefresh.isRefreshing = false
+                // Stop swipe refresh animation and toast
+                if (swipeRefresh.isRefreshing) {
+                    swipeRefresh.isRefreshing = false
+                    Toast.makeText(applicationContext, "Refresh successful", Toast.LENGTH_SHORT).show()
+                }
 
-                // Response body to string
+                // Response body to string,
+                // then create a variable from weatherResponse and the response body using Gson.
                 val body = response?.body?.string()
-
-                // Create gson
                 val gson = GsonBuilder().create()
-
-                // create a variable from weatherResponse and the response body using gson
                 val weatherObj = gson.fromJson(body, weatherResponse::class.java)
 
                 // Send the data to the viewModels
@@ -358,6 +339,34 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
                 if (swipeRefresh.isRefreshing) swipeRefresh.isRefreshing = false
             }
         })
+    }
+
+
+    /**
+     * Receives data that is then updated for the weatherViewModel and weekViewModel.
+     * The viewModels use liveData to keep the UI up to date with listeners in fragments.
+     *
+     * @param data is an object containing all of the weather data
+     */
+    private fun updateData(data: weatherResponse) {
+        runOnUiThread() {
+            // Convert visibility distance from metres to km or miles
+            data.current.visibility = distanceConverter(data.current.visibility, dist)
+
+            // Put data type suffixes into the weatherViewModel
+            weatherViewModel.suffixDist.value = dist
+            weatherViewModel.suffixSpeed.value = speed
+            weatherViewModel.suffixTemp.value = degr
+            // Put weather and timezone data into the weatherViewModel
+            weatherViewModel.timezone.value = data.timezoneOffset
+            weatherViewModel.currentWeather.value = data.current
+
+            // Put temperature suffix into the weekViewModel
+            weekViewModel.suffixTemp.value = degr
+            // Put timezone and a list of 8 days into viewModel
+            weekViewModel.timezone.value = data.timezoneOffset
+            weekViewModel.dailyWeather.value = data.daily
+        }
     }
 
     /**
