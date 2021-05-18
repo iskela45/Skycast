@@ -1,5 +1,5 @@
 # Skycast  
-Mobile application to check weather data based on the device location. Main window shows the current weather data and the weekly view shows weather data for the next 7 days, measurement system can be switched between Metric and Imperial in the settings menu. The weekly view also utilizes OpenWeather icons to describe the current weather.
+Mobile application to check weather data based on the device location. Main window shows the current weather data and the weekly view shows weather data for the next 7 days, measurement system can be switched between Metric and Imperial in the settings menu. The weekly view also utilizes OpenWeather icons to describe the current weather and the weather data can be refreshed by swiping in a downward motion.
 
 ## Name  
 Aleksi Pynnönen  
@@ -11,15 +11,21 @@ A mobile application that shows the current and future weather for the next seve
 Android/Kotlin  
 
 ## Google Play link  
-https://play.google.com/store/apps/details?id=fi.organization.skycast  
+https://play.google.com/store/apps/details?id=fi.organization.skycast
 Not up at the moment as the app hasn't been approved yet but it should be up soon™
 
-## Release 1 features  
-Every feature described above has been implemented, a few bugs and some code cleanup left before final release.
+## Release 1 features
+* Getting and converting data from openWeather oneCall API.
+* BottomNavigationView (Jetpack).
+* ViewModel & LiveData implementation.
+* Location data and requesting permission.
+* Selecting between metric and imperial using sharedPreferences.
+* All fragments are functionally finished.
 
 ## Release 2 features
 * Swipe refresh to update weather data along toasts for successful and unsuccessful refreshes.
 * Custom app icon.
+* Titles
 * Replaced the old location implementation, now the app isn't reliant on other apps asking the phone for location updates and actively asks for the location data instead of just listening.
 * Large scale codebase cleanup.
 * More documentation for the codebase.
