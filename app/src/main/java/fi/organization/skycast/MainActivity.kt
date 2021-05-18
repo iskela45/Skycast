@@ -87,11 +87,11 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        // Initialize and configure locationRequest
+        // Initialize and configure locationRequest, use high accuracy to get cords quickly
         locationRequest = LocationRequest.create()
         locationRequest.interval = 1000
         locationRequest.fastestInterval = 300
-        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY // city level accuracy
+        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
 
         // Read unit preferences from settings, metric by default, update activity values.
         prefs = PreferenceManager.getDefaultSharedPreferences(this)
