@@ -15,3 +15,11 @@ TBD
 
 ## Release 1 features  
 Every feature described above has been implemented, a few bugs and some code cleanup left before final release.
+
+## Release 2 features
+* Swipe refresh to update weather data along toasts for successful and unsuccessful refreshes.
+* Custom app icon.
+* Replaced the old location implementation, now the app isn't reliant on other apps asking the phone for location updates and actively asks for the location data instead of just listening.
+* Large scale codebase cleanup.
+* More documentation for the codebase.
+* Reopening the app now puts the user in the same fragment where they left off.
