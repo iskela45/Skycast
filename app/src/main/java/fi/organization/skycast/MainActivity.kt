@@ -21,8 +21,6 @@ import fi.organization.skycast.response.weatherResponse
 import okhttp3.*
 import java.io.IOException
 
-//TODO: Fix first data being at 0-0
-
 class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
     // Fragments
@@ -48,6 +46,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
     lateinit var bottomNavigationView: BottomNavigationView
     lateinit var prefs : SharedPreferences
     lateinit var locationRequest: LocationRequest
+    var dataLoaded = false
 
     /**
      * Used when requesting to start location updates.
@@ -55,12 +54,12 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
      */
     private var locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
-            //if (locationResult == null) return
 
-            // Call fetchJson using the latest location result, if the list is empty use 0.0
+            // Call fetchJson using the latest location if no data has been loaded and data is not null.
             val loc = locationResult.locations.lastOrNull()
-            if(loc?.latitude ?: 0.0 == 0.0 && loc?.longitude ?: 0.0 == 0.0) {
-                fetchJson(loc?.latitude ?: 0.0, loc?.longitude ?: 0.0)
+            if(loc != null && !dataLoaded) {
+                fetchJson(loc.latitude, loc.longitude)
+                dataLoaded = true
             }
 
             // When a new location is added update it into preferences.
@@ -94,10 +93,18 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         locationRequest.fastestInterval = 300
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY // city level accuracy
 
-        // Read unit preferences from settings, metric by default.
+        // Read unit preferences from settings, metric by default, update activity values.
         prefs = PreferenceManager.getDefaultSharedPreferences(this)
         val unitPref = prefs.getString("MEASUREMENTS", "metric")
-        if (unitPref == "imperial") checkImperial() else checkMetric()
+        if (unitPref == "imperial") {
+            dist = " miles"
+            degr = "°F"
+            speed = " mph"
+        } else {
+            dist = " km"
+            degr = "°C"
+            speed = " m/s"
+        }
 
         // Start with main fragment
         setCurrentFrag(mainFrag)
