@@ -21,6 +21,7 @@ import fi.organization.skycast.response.weatherResponse
 import okhttp3.*
 import java.io.IOException
 
+//TODO: Fix first data being at 0-0
 
 class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
@@ -33,7 +34,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
     var degr = "°C"
     var speed = " m/s"
 
-    private val COARSE_LOCATION_RQ = 101
+    private val FINE_LOCATION_RQ = 101
 
     // ViewModels
     lateinit var weatherViewModel: WeatherViewModel
@@ -54,15 +55,17 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
      */
     private var locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
+            //if (locationResult == null) return
 
             // Call fetchJson using the latest location result, if the list is empty use 0.0
             val loc = locationResult.locations.lastOrNull()
-            fetchJson(loc?.latitude ?: 0.0, loc?.longitude ?: 0.0)
+            if(loc?.latitude ?: 0.0 == 0.0 && loc?.longitude ?: 0.0 == 0.0) {
+                fetchJson(loc?.latitude ?: 0.0, loc?.longitude ?: 0.0)
+            }
 
             // When a new location is added update it into preferences.
             // New location data will be used when refreshing or changing measurement settings.
             for (location in locationResult.locations) {
-                println("location: $location")
                 val prefsEditor = prefs.edit()
                 prefsEditor.putString("LAT", location.latitude.toString())
                 prefsEditor.putString("LON", location.longitude.toString())
@@ -73,7 +76,6 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        println("CREATED")
         super.onCreate(savedInstanceState)
 
         registerPreferenceListener()
@@ -90,7 +92,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         locationRequest = LocationRequest.create()
         locationRequest.interval = 1000
         locationRequest.fastestInterval = 300
-        locationRequest.priority = LocationRequest.PRIORITY_LOW_POWER // city level accuracy
+        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY // city level accuracy
 
         // Read unit preferences from settings, metric by default.
         prefs = PreferenceManager.getDefaultSharedPreferences(this)
@@ -162,9 +164,9 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         }
 
         checkForPermissions(
-                android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                android.Manifest.permission.ACCESS_FINE_LOCATION,
                 "location",
-                COARSE_LOCATION_RQ
+                FINE_LOCATION_RQ
         )
 
         super.onResume()
@@ -248,6 +250,11 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
                 Toast.makeText(applicationContext, "$name permission granted", Toast.LENGTH_SHORT).show()
 
                 // Load measurement system setting and update data if the permission is successful
+                when (PackageManager.PERMISSION_GRANTED) {
+                    ContextCompat.checkSelfPermission(applicationContext, android.Manifest.permission.ACCESS_FINE_LOCATION) -> {
+                        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+                    }
+                }
                 val prefs = PreferenceManager.getDefaultSharedPreferences(this)
                 val unitPref = prefs?.getString("MEASUREMENTS", "metric")
                 if (unitPref == "imperial") checkImperial() else checkMetric()
@@ -255,7 +262,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         }
 
         when (requestCode) {
-            COARSE_LOCATION_RQ -> innerCheck("location")
+            FINE_LOCATION_RQ -> innerCheck("location")
         }
     }
 
@@ -302,10 +309,10 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
         // API_KEY is found in local.properties.
         val url = "https://api.openweathermap.org/data/2.5/onecall?lat=$lat&lon=$lon&units=$unitType&exclude=hourly,minutely&appid=${BuildConfig.API_KEY}"
-        println("url: $url")
+        //println("url: $url")
 
-        println("lat: $lat")
-        println("lon: $lon")
+        //println("lat: $lat")
+        //println("lon: $lon")
 
         val request = Request.Builder().url(url).build()
         val client = OkHttpClient()
@@ -332,12 +339,11 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
             // Triggered if the request fails.
             // Toast to tell the user there is a connection problem and stop refresh animation.
             override fun onFailure(call: Call, e: IOException) {
-                Toast.makeText(applicationContext, "Connection to openWeather failed", Toast.LENGTH_SHORT).show()
+                runOnUiThread() { Toast.makeText(applicationContext, "Connection to openWeather failed", Toast.LENGTH_SHORT).show() }
                 if (swipeRefresh.isRefreshing) swipeRefresh.isRefreshing = false
             }
         })
     }
-
 
     /**
      * Receives data that is then updated for the weatherViewModel and weekViewModel.
@@ -395,7 +401,4 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
             if (x == "imperial") checkImperial() else checkMetric()
         }
     }
-
-
-
 }
