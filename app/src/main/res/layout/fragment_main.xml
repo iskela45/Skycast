@@ -6,8 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".MainFrag">
 
-    <!-- TODO: Update blank fragment layout -->
-
     <TextView
         android:id="@+id/mainFragText"
         android:layout_width="match_parent"
@@ -104,7 +102,6 @@
             android:text="-" />
 
     </LinearLayout>
-
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="100dp"
@@ -137,7 +134,6 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="-" />
-
     </LinearLayout>
 
     <LinearLayout
@@ -173,20 +169,4 @@
             android:text="-" />
 
     </LinearLayout>
-
-    <!-- <LinearLayout
-        android:id="@+id/linearLayout3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="@+id/mainFragText"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/feelsLike">
-
-
-    </LinearLayout> -->
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

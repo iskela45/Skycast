@@ -317,7 +317,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
                 // Stop swipe refresh animation and toast
                 if (swipeRefresh.isRefreshing) {
                     swipeRefresh.isRefreshing = false
-                    Toast.makeText(applicationContext, "Refresh successful", Toast.LENGTH_SHORT).show()
+                    runOnUiThread() { Toast.makeText(applicationContext, "Refresh successful", Toast.LENGTH_SHORT).show() }
                 }
 
                 // Response body to string,
@@ -331,11 +331,9 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
             }
 
             // Triggered if the request fails.
+            // Toast to tell the user there is a connection problem and stop refresh animation.
             override fun onFailure(call: Call, e: IOException) {
-                // Toast to tell the user there is a connection problem
                 Toast.makeText(applicationContext, "Connection to openWeather failed", Toast.LENGTH_SHORT).show()
-
-                // Stop swipe refresh animation
                 if (swipeRefresh.isRefreshing) swipeRefresh.isRefreshing = false
             }
         })
