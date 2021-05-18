@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    // used to read API key from local.properties.
+    id("com.google.secrets_gradle_plugin") version "0.6"
 }
 
 android {
@@ -62,32 +64,8 @@ dependencies {
     // Location services
     implementation "com.google.android.gms:play-services-location:18.0.0"
 
-    // Easy location permissions
-    implementation 'com.vmadalin:easypermissions-ktx:1.0.0'
-    implementation 'androidx.preference:preference:1.1.1'
-
     // Preferences
-    implementation "androidx.preference:preference:1.1.1"
-
-
-    // Retrofit
-    // 'com.squareup.retrofit2:retrofit:2.9.0'
-    //implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-
-    // Jackson
-    //implementation 'com.fasterxml.jackson.core:jackson-core:2.10.1'
-    //implementation 'com.fasterxml.jackson.core:jackson-annotations:2.10.1'
-    //implementation 'com.fasterxml.jackson.core:jackson-databind:2.10.1'
-
-    // Coroutines
-    //implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0-RC'
-    //implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0-RC'
-    //implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1"
-
-    // rxjava2
-    //implementation "com.squareup.retrofit2:adapter-rxjava2:2.3.0"
-    //implementation "io.reactivex.rxjava2:rxandroid:2.0.1"
-
+    implementation "androidx.preference:preference-ktx:1.1.1"
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

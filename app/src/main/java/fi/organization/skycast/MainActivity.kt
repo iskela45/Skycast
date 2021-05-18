@@ -24,7 +24,6 @@ import java.io.IOException
 
 class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
-    // TODO: clean up dependencies.
     // Fragments
     private val mainFrag = MainFrag()
     private val weekFrag = WeekFragment()
@@ -130,8 +129,8 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         // Set swipe to refresh view to call for a new json.
         swipeRefresh = findViewById(R.id.swipeRefresh)
         swipeRefresh.setOnRefreshListener {
-            val unitPref = prefs.getString("MEASUREMENTS", "metric")
-            if (unitPref == "imperial") checkImperial() else checkMetric()
+            val refreshUnitPref = prefs.getString("MEASUREMENTS", "metric")
+            if (refreshUnitPref == "imperial") checkImperial() else checkMetric()
         }
     }
 
@@ -217,7 +216,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         builder.apply {
             setMessage("This app requires your $name data to function properly")
             setTitle("Permission required")
-            setPositiveButton("OK") { dialog, which ->
+            setPositiveButton("OK") { _, _ ->
                 ActivityCompat.requestPermissions(
                         this@MainActivity,
                         arrayOf(permission),
@@ -270,8 +269,8 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         speed = " m/s"
 
         // Read data from preferences and call fetchJson() using the data.
-        val prefLat : Double = prefs?.getString("LAT", "0")?.toDouble() ?: 0.0
-        val prefLon : Double = prefs?.getString("LON", "0")?.toDouble() ?: 0.0
+        val prefLat : Double = prefs.getString("LAT", "0")?.toDouble() ?: 0.0
+        val prefLon : Double = prefs.getString("LON", "0")?.toDouble() ?: 0.0
         fetchJson(prefLat, prefLon)
     }
 
@@ -285,8 +284,8 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         speed = " mph"
 
         // Read data from preferences and call fetchJson() using the data.
-        val prefLat : Double = prefs?.getString("LAT", "0")?.toDouble() ?: 0.0
-        val prefLon : Double = prefs?.getString("LON", "0")?.toDouble() ?: 0.0
+        val prefLat : Double = prefs.getString("LAT", "0")?.toDouble() ?: 0.0
+        val prefLon : Double = prefs.getString("LON", "0")?.toDouble() ?: 0.0
         fetchJson(prefLat, prefLon)
     }
 
@@ -299,10 +298,10 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
      */
     fun fetchJson(lat: Double, lon: Double) {
         // Load measurement preferences.
-        val unitType = prefs?.getString("MEASUREMENTS", "metric")
+        val unitType = prefs.getString("MEASUREMENTS", "metric")
 
-        // TODO: Hide the APIKey and generate a new one since this has gone to github.
-        val url = "https://api.openweathermap.org/data/2.5/onecall?lat=$lat&lon=$lon&units=$unitType&exclude=hourly,minutely&appid=7900bd079ee8808aa0a42b4e13cf1c71"
+        // API_KEY is found in local.properties.
+        val url = "https://api.openweathermap.org/data/2.5/onecall?lat=$lat&lon=$lon&units=$unitType&exclude=hourly,minutely&appid=${BuildConfig.API_KEY}"
         println("url: $url")
 
         println("lat: $lat")
@@ -322,7 +321,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
                 // Response body to string,
                 // then create a variable from weatherResponse and the response body using Gson.
-                val body = response?.body?.string()
+                val body = response.body?.string()
                 val gson = GsonBuilder().create()
                 val weatherObj = gson.fromJson(body, weatherResponse::class.java)
 
@@ -392,7 +391,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
      */
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         if (key == "MEASUREMENTS") {
-            var x = sharedPreferences?.getString("MEASUREMENTS", "metric")
+            val x = sharedPreferences?.getString("MEASUREMENTS", "metric")
             if (x == "imperial") checkImperial() else checkMetric()
         }
     }
