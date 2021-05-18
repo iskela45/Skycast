@@ -11,7 +11,7 @@ A mobile application that shows the current and future weather for the next seve
 Android/Kotlin  
 
 ## Google Play link  
-https://play.google.com/store/apps/details?id=fi.organization.skycast
+https://play.google.com/store/apps/details?id=fi.organization.skycast  
 Not up at the moment as the app hasn't been approved yet but it should be up soon™
 
 ## Release 1 features  
