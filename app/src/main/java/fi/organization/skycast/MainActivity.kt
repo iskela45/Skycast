@@ -219,6 +219,10 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
     /**
      * Create a dialog asking if the user will grant location permission
+     *
+     * @param permission permission type, in this case it's always coarse location.
+     * @param name the name of the permission used in dialog boxes and toasts.
+     * @param requestCode a request code.
      */
     private fun showDialog(permission: String, name: String, requestCode: Int) {
         val builder = AlertDialog.Builder(this)
