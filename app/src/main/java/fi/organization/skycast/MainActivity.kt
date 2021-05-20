@@ -54,20 +54,19 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
      */
     private var locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
-
-            // Call fetchJson using the latest location if no data has been loaded and data is not null.
-            val loc = locationResult.locations.lastOrNull()
-            if(loc != null && !dataLoaded) {
-                fetchJson(loc.latitude, loc.longitude)
+            
+            val lastLoc = locationResult.lastLocation
+            // Call fetchJson using the latest location if no data has been loaded.
+            if (!dataLoaded) {
+                fetchJson(lastLoc.latitude, lastLoc.longitude)
                 dataLoaded = true
             }
 
-            // When a new location is added update it into preferences.
-            // New location data will be used when refreshing or changing measurement settings.
-            for (location in locationResult.locations) {
+            // Update latest location data to preferences.
+            if (lastLoc.latitude != 0.0 && lastLoc.latitude != 0.0) {
                 val prefsEditor = prefs.edit()
-                prefsEditor.putString("LAT", location.latitude.toString())
-                prefsEditor.putString("LON", location.longitude.toString())
+                prefsEditor.putString("LAT", lastLoc.latitude.toString())
+                prefsEditor.putString("LON", lastLoc.longitude.toString())
                 prefsEditor.apply()
             }
         }
