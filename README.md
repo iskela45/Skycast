@@ -12,7 +12,6 @@ Android/Kotlin
 
 ## Google Play link  
 https://play.google.com/store/apps/details?id=fi.organization.skycast
-Not up at the moment as the app hasn't been approved yet but it should be up soon™
 
 ## Release 1 features
 * Getting and converting data from openWeather oneCall API.  
