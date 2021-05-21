@@ -15,11 +15,13 @@ https://play.google.com/store/apps/details?id=fi.organization.skycast
 Not up at the moment as the app hasn't been approved yet but it should be up soon™
 
 ## Release 1 features
-* Getting and converting data from openWeather oneCall API.
+* Getting and converting data from openWeather oneCall API.  
+* Current weather data in first fragment  
+* Weather data for the next week in the 2nd fragment  
+* Selecting between metric and imperial using settings menu.
 * BottomNavigationView (Jetpack).
 * ViewModel & LiveData implementation.
-* Location data and requesting permission.
-* Selecting between metric and imperial using sharedPreferences.
+* Location data and requesting permission for it using a dialog box.
 * All fragments are functionally finished.
 
 ## Release 2 features
