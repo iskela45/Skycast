@@ -13,8 +13,8 @@ Code is easy to read and it's well sectioned. Line length is quite long here and
 ## Documentation
 README covers everything it should. Code is commented thoroughly so it's easy to know what each function etc. does. Good job here as well.
 
-## Grade requirements
-In reference to requirements for grade 5:
+## Grade
+I think Skycast meets all requirements for grade 5:
 - App is published to Google Play
 - User experience is great
 - App is complete and code is clean
