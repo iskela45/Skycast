@@ -7,6 +7,9 @@ Aleksi Pynnönen
 ## Topic  
 A mobile application that shows the current and future weather for the next seven days using OpenWeather API. The location is either based on the users GPS location or a given city name.  
 
+![Mobile screenshot of the current weather view](https://i.imgur.com/tqb3UWW.png)
+![Mobile screenshot of the upcoming weather view](https://i.imgur.com/3J1INzq.png)
+
 ## Target  
 Android/Kotlin  
 
